@@ -1,0 +1,255 @@
+***************************
+mm.c (naive implementation)
+***************************
+
+1. There are no headers , so no implicit or explicit free list.
+2. malloc - no searning for free block, always new memory block allocated.
+3. free - no headers , so we can not track free memory block, its lost.
+3. realloc - allocating new memory block using malloc and copying previous block data to it , old memory block is lost.
+
+Performance of mm.c
+
+1. Reading tracefile: traces/short1-bal.rep
+Checking mm_malloc for correctness, efficiency, and performance.
+
+Results for mm malloc:
+trace  valid  util     ops      secs	  Kops
+ 0       yes   50%      12  0.000002	  6000
+Total          50%      12  0.000002	  6000
+
+Perf index = 30 (util) + 40 (thru) = 70/100
+
+2. Reading tracefile: traces/short2-bal.rep
+Checking mm_malloc for correctness, efficiency, and performance.
+
+Results for mm malloc:
+trace  valid  util     ops      secs	  Kops
+ 0       yes  100%      12  0.000007	  1739
+Total         100%      12  0.000007	  1739
+
+Perf index = 60 (util) + 40 (thru) = 100/100
+
+3. Reading tracefile: traces/short3-bal.rep
+Checking mm_malloc for correctness, efficiency, and performance.
+
+Results for mm malloc:
+trace  valid  util     ops      secs	  Kops
+ 0       yes   49%      10  0.000010	   990
+Total          49%      10  0.000010	   990
+
+Perf index = 30 (util) + 40 (thru) = 70/100
+
+4. Reading tracefile: traces/binary-bal.rep
+Checking mm_malloc for correctness, efficiency, and performance.
+
+Results for mm malloc:
+trace  valid  util     ops      secs	  Kops
+ 0       yes   56%   12000  0.000056	215827
+Total          56%   12000  0.000056	215827
+
+Perf index = 34 (util) + 40 (thru) = 74/100
+
+5. Reading tracefile: traces/cp-decl-bal.rep
+Checking mm_malloc for correctness, efficiency, and performance.
+
+Results for mm malloc:
+trace  valid  util     ops      secs	  Kops
+ 0       yes   30%    6648  0.000091	 73377
+Total          30%    6648  0.000091	 73377
+
+Perf index = 18 (util) + 40 (thru) = 58/100
+
+6. Reading tracefile: traces/random-bal.rep
+ERROR: mem_sbrk failed. Ran out of memory...
+Checking mm_malloc for correctness, ERROR [trace 0, line 1666]: Payload address (0xffffffff) not aligned to 8 bytes
+
+Results for mm malloc:
+trace  valid  util     ops      secs	  Kops
+ 0        no     -       -         -	     -
+Total            -       -         -	     -
+
+Terminated with 1 errors
+
+7 .Reading tracefile: traces/realloc-bal.rep
+ERROR: mem_sbrk failed. Ran out of memory...
+Checking mm_malloc for correctness, ERROR [trace 0, line 1705]: Payload address (0xffffffff) not aligned to 8 bytes
+
+Results for mm malloc:
+trace  valid  util     ops      secs	  Kops
+ 0        no     -       -         -	     -
+Total            -       -         -	     -
+
+Terminated with 1 errors
+
+***********************************
+mm1.c (sorted explicit free list)
+***********************************
+
+1. 16 bytes header is used to store 2 pointers - previous and next and size of allocated block.
+2. We are using explicit lists for both allocated blocks and free blocks .
+3. free blocks list is sorted , for allocated list , we are appending new memory block at last (last_allocated pointer is uesd).
+4. 2-side coalescing is done whenever a new block is added to free list.
+5. malloc - first a block is searched in free list using best fit strategy , if found then its allocated else new memory block is allocated. O(n)
+6. free - firstly, block is searched in allocated list ,then deleted from allocated list and added to free list , O(n)
+7. realloc - we simply used malloc to allocate/find a free memory block and then copied data to it from previous and call to free(). O(n)
+
+Performance of mm1.c
+
+1. Reading tracefile: traces/short1-bal.rep
+Checking mm_malloc for correctness, efficiency, and performance.
+
+Results for mm malloc:
+trace  valid  util     ops      secs	  Kops
+ 0       yes   99%      12  0.000001	 13333
+Total          99%      12  0.000001	 13333
+
+Perf index = 60 (util) + 40 (thru) = 100/100
+
+
+2. Reading tracefile: traces/short2-bal.rep
+Checking mm_malloc for correctness, efficiency, and performance.
+
+Results for mm malloc:
+trace  valid  util     ops      secs	  Kops
+ 0       yes   99%      12  0.000001	 15000
+Total          99%      12  0.000001	 15000
+
+Perf index = 60 (util) + 40 (thru) = 100/100
+
+3.Reading tracefile: traces/short3-bal.rep
+Checking mm_malloc for correctness, efficiency, and performance.
+
+Results for mm malloc:
+trace  valid  util     ops      secs	  Kops
+ 0       yes   50%      10  0.000001	 12500
+Total          50%      10  0.000001	 12500
+
+Perf index = 30 (util) + 40 (thru) = 70/100
+
+4.Reading tracefile: traces/binary-bal.rep
+Checking mm_malloc for correctness, efficiency, and performance.
+
+Results for mm malloc:
+trace  valid  util     ops      secs	  Kops
+ 0       yes   54%   12000  0.053375	   225
+Total          54%   12000  0.053375	   225
+
+Perf index = 32 (util) + 15 (thru) = 47/100
+
+5.Reading tracefile: traces/random-bal.rep
+Checking mm_malloc for correctness, efficiency, and performance.
+
+Results for mm malloc:
+trace  valid  util     ops      secs	  Kops
+ 0       yes   95%    4800  0.008909	   539
+Total          95%    4800  0.008909	   539
+
+Perf index = 57 (util) + 36 (thru) = 93/100
+
+6. Reading tracefile: traces/cp-decl-bal.rep
+Checking mm_malloc for correctness, efficiency, and performance.
+
+Results for mm malloc:
+trace  valid  util     ops      secs	  Kops
+ 0       yes   99%    6648  0.009307	   714
+Total          99%    6648  0.009307	   714
+
+Perf index = 59 (util) + 40 (thru) = 99/100
+
+7.Reading tracefile: traces/realloc-bal.rep
+Checking mm_malloc for correctness, efficiency, and performance.
+
+Results for mm malloc:
+trace  valid  util     ops      secs	  Kops
+ 0       yes   23%   14401  0.112755	   128
+Total          23%   14401  0.112755	   128
+
+Perf index = 14 (util) + 9 (thru) = 23/100
+
+
+********************************************
+mm2.c  (balanced binary tree implementation)
+********************************************
+
+1. 16 bytes header is used for a tree node , it contains left pointer , right pointer , size of block and height of node.
+2. Using explicit lists for tracking allocted blocks and free blocks.
+3. Insertion and deletion in free list takes O(log n) time , since tree is balanced.
+4. 2-sided coalescing is used in same way as mm1.c .
+5. malloc - first a block is searched in free list using first fit strategy , if found then its allocated else new memory block is allocated. O(n)
+6. free - firstly, block is searched in allocated list ,then deleted from allocated list and added to free list , O(log n)
+7. realloc - here , if next block adjacent to current block last address is free ,and fulfills the condition , then we extend the size of previously allcated block 	  and delete next block from free-list.
+    else malloc to allocate/find a free memory block and then copied data to it from previous and call to free(). O(n) in worst case.
+    
+Performance of mm2.c
+
+1.Reading tracefile: traces/short1-bal.rep
+Checking mm_malloc for correctness, efficiency, and performance.
+
+Results for mm malloc:
+trace  valid  util     ops      secs	  Kops
+ 0       yes   99%      12  0.000002	  6667
+Total          99%      12  0.000002	  6667
+
+Perf index = 60 (util) + 40 (thru) = 100/100
+
+2.Reading tracefile: traces/short2-bal.rep
+Checking mm_malloc for correctness, efficiency, and performance.
+
+Results for mm malloc:
+trace  valid  util     ops      secs	  Kops
+ 0       yes   99%      12  0.000002	  7059
+Total          99%      12  0.000002	  7059
+
+Perf index = 60 (util) + 40 (thru) = 100/100
+
+3 .Reading tracefile: traces/short3-bal.rep
+Checking mm_malloc for correctness, efficiency, and performance.
+
+Results for mm malloc:
+trace  valid  util     ops      secs	  Kops
+ 0       yes   50%      10  0.000002	  6250
+Total          50%      10  0.000002	  6250
+
+Perf index = 30 (util) + 40 (thru) = 70/100
+
+4. Reading tracefile: traces/random-bal.rep
+Checking mm_malloc for correctness, efficiency, and performance.
+
+Results for mm malloc:
+trace  valid  util     ops      secs	  Kops
+ 0       yes   90%    4800  0.004644	  1034
+Total          90%    4800  0.004644	  1034
+
+Perf index = 56 (util) + 40 (thru) = 94/100
+
+5. Reading tracefile: traces/binary-bal.rep
+Checking mm_malloc for correctness, efficiency, and performance.
+
+Results for mm malloc:
+trace  valid  util     ops      secs	  Kops
+ 0       yes   54%   12000  0.029022	   413
+Total          54%   12000  0.029022	   413
+
+Perf index = 32 (util) + 28 (thru) = 60/100
+
+6. Reading tracefile: traces/cp-decl-bal.rep
+Checking mm_malloc for correctness, efficiency, and performance.
+
+Results for mm malloc:
+trace  valid  util     ops      secs	  Kops
+ 0       yes   96%    6648  0.002600	  2557
+Total          96%    6648  0.002600	  2557
+
+Perf index = 57 (util) + 40 (thru) = 97/100
+
+7 .Reading tracefile: traces/realloc-bal.rep
+Checking mm_malloc for correctness, efficiency, and performance.
+
+Results for mm malloc:
+trace  valid  util     ops      secs	  Kops
+ 0       yes   43%   14401  0.001199	 12009
+Total          43%   14401  0.001199	 12009
+
+Perf index = 26 (util) + 40 (thru) = 66/100
+
+
